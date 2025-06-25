@@ -6,7 +6,7 @@ from collections import defaultdict
 
 
 BUFFER = 1024
-TIMEOUT = 5
+TIMEOUT = 1
 FINISH = "/exit"
 
 def get_address():
@@ -44,7 +44,7 @@ def get_room(session, clients_in_rooms):
             return room
 
 def handle_clients(session_list, clients_in_rooms):
-    readable, _, _ = select.select(session_list, [], []) 
+    readable, _, _ = select.select(session_list, [], [], 5) 
     
     for session in readable:
         room_name = get_room(session, clients_in_rooms)
@@ -69,16 +69,15 @@ def handle_server():
     while session_list != [] or first:
         if session_list != [] and first:
             first = False
-            print("first test")
         try:
             server_sock.settimeout(TIMEOUT)
             conn, addr = server_sock.accept()
-            print("Before set blocking")
-            conn.setblocking(False)
             session_list.append(conn)
             print("Before room")
-            #room = get_first_room(conn)
-            clients_in_rooms["test"].append(conn) 
+            room = get_first_room(conn)
+            clients_in_rooms[room].append(conn)
+            print(clients_in_rooms)
+            conn.setblocking(False)
         except BlockingIOError:
             pass
         except TimeoutError:

@@ -53,7 +53,6 @@ def handle_client():
     connect_client(my_sock, (args.ip, args.port))
     message = args.room_name
     print(message)
-    time.sleep(1)
     my_sock.send(message.encode())
     print("Type /exit to stop the connection")
     print(f"{args.name} you are in the chat! ")
