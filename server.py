@@ -27,6 +27,11 @@ def connect_server(server_sock, address):
     except socket.gaierror:
         print("This is not a valid address")
 
+def get_first_room(session):
+    room = session.recv(BUFFER).decode()
+    print(room)
+    return room
+  
 def handle_rooms(session, data, client_list):
     for client_session in client_list:
         if session != client_session:
@@ -52,8 +57,8 @@ def handle_clients(session_list, clients_in_rooms):
             session.close()
         else:
             handle_rooms(session, recv_data, clients_in_rooms[room_name])
-            
-        
+
+
 def handle_server():
     session_list = []
     first = True
@@ -62,18 +67,28 @@ def handle_server():
     server_sock = socket.socket()
     connect_server(server_sock, address)
     while session_list != [] or first:
-        print(session_list)
-        if first:
+        if session_list != [] and first:
             first = False
+            print("first test")
         try:
             server_sock.settimeout(TIMEOUT)
             conn, addr = server_sock.accept()
+            print("Before set blocking")
             conn.setblocking(False)
             session_list.append(conn)
-            clients_in_rooms["test"].append(conn) #Need to receive the room 
-            handle_clients(session_list, clients_in_rooms)
+            print("Before room")
+            #room = get_first_room(conn)
+            clients_in_rooms["test"].append(conn) 
+        except BlockingIOError:
+            pass
         except TimeoutError:
+            pass
+        finally:
+            print("before handle clients test")
             handle_clients(session_list, clients_in_rooms)
+
+
+          
     
     server_sock.close()
 

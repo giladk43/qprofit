@@ -2,6 +2,7 @@ import socket
 import select
 import sys
 import argparse
+import time
 
 TIMEOUT = 1
 BUFFER = 1024
@@ -51,6 +52,8 @@ def handle_client():
     end_convo = True
     connect_client(my_sock, (args.ip, args.port))
     message = args.room_name
+    print(message)
+    time.sleep(1)
     my_sock.send(message.encode())
     print("Type /exit to stop the connection")
     print(f"{args.name} you are in the chat! ")
